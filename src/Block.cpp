@@ -4,27 +4,31 @@
 
 #include "Block.h"
 
+#include <cstddef>
 #include <cstring>
 #include <ctime>
+#include <string>
 #include <vector>
 
 #include "Util.h"
 
 namespace {
 using std::size_t;
+using std::string;
 using std::time;
 using std::time_t;
+using std::uint64_t;
 using std::vector;
 }  // namespace
 
-Block::Block(const std::string &key, const std::string &value)
+Block::Block(const string &key, const string &value)
     : timestamp_{time(nullptr)},
       key_size_{static_cast<size_t>(key.size())},
       value_size_{static_cast<size_t>(value.size())},
       key_{key},
       value_{value} {}
 
-std::vector<char> Block::serializer() const {
+vector<char> Block::serializer() const {
   const size_t len = sizeof(timestamp_) + sizeof(key_size_) +
                      sizeof(value_size_) + key_.size() + value_.size();
 
@@ -65,3 +69,10 @@ std::vector<char> Block::serializer() const {
 
   return res;
 }
+
+uint64_t Block::value_offset() const {
+  return sizeof(timestamp_) + sizeof(key_size_) + sizeof(value_size_) +
+         key_.size();
+}
+
+time_t Block::timestamp() const { return timestamp_; }

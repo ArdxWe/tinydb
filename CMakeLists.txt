@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-project(bitmask)
+project(tinydb)
 
 set(CMAKE_CXX_STANDARD 20)
 
 add_compile_options(-Wall -Werror)
 
-add_executable(bitmask
+add_executable(tinydb
                src/main.cpp
                src/Block.cpp
                src/Block.h
@@ -14,4 +14,10 @@ add_executable(bitmask
                src/Conf.cpp
                src/Conf.h
                src/Util.cpp
-               src/Util.h)
+               src/Util.h
+               src/Database.cpp
+               src/Database.h
+               src/Map.cpp
+               src/Map.h
+               src/Path.cpp
+               src/Path.h)

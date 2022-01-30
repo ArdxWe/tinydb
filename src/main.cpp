@@ -1,20 +1,18 @@
 #include <string>
 
-#include "Block.h"
-#include "Datafile.h"
+#include "Database.h"
 
-using namespace std;
+namespace {
+using std::string;
+}  // namespace
 
 int main() {
+  Database db;
   string key = "fuck";
   string value = "adder";
 
-  Block block{key, value};
-  Datafile file{"y"};
-  file.insert(block);
-  file.insert(block);
-  for (int i = 0; i < 10000000; i++) {
-    file.insert(block);
+  for (int i = 0; i < 500000; i++) {
+    db.put(key, value);
   }
   return 0;
 }

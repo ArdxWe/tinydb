@@ -2,10 +2,9 @@
 // Created by ardxwe on 2022/1/30.
 //
 
-#ifndef BITMASK_UTIL_H
-#define BITMASK_UTIL_H
+#ifndef SRC_UTIL_H_
+#define SRC_UTIL_H_
 
-#include <filesystem>
 #include <string>
 
 class Util {
@@ -24,11 +23,6 @@ class Util {
     }
     return res;
   }
-
-  static std::size_t file_size(const std::string& file_name) {
-    std::filesystem::path path{file_name};
-    return static_cast<std::size_t>(std::filesystem::file_size(path));
-  }
 };
 
-#endif  // BITMASK_UTIL_H
+#endif  // SRC_UTIL_H_
