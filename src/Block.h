@@ -16,6 +16,8 @@ class Block {
   friend class Datafile;
 
   Block(const std::string& key, const std::string& value);
+  // deleted block
+  explicit Block(const std::string& key);
   [[nodiscard]] std::vector<char> serializer() const;
   [[nodiscard]] std::uint64_t value_offset() const;
   [[nodiscard]] std::time_t timestamp() const;

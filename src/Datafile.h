@@ -17,6 +17,7 @@ class Datafile {
   bool insert(const Block& block);
   std::uint64_t offset();
   bool active() const;
+  std::string read(std::size_t offset, std::size_t size);
 
   Datafile(const Datafile& other) = delete;
   Datafile& operator=(const Datafile& other) = delete;

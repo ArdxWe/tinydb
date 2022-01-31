@@ -19,6 +19,8 @@ class Database {
   Database& operator=(const Database& other) = delete;
 
   void put(const std::string& key, const std::string& value);
+  void del(const std::string& key);
+  std::string get(const std::string& key);
 
  private:
   std::vector<std::unique_ptr<Datafile>> old_files_{};

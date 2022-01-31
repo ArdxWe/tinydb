@@ -32,6 +32,11 @@ void Database::put(const string &key, const string &value) {
     active_file_->insert(block);
   }
 
+  // del
+  if (value.empty()) {
+    return;
+  }
+
   Value v = {
       file_id_,
       value.size(),
@@ -44,4 +49,19 @@ void Database::put(const string &key, const string &value) {
 Database::Database() {
   string active_file_name = Path::data_file_name(file_id_);
   active_file_ = make_unique<Datafile>(active_file_name);
+}
+
+void Database::del(const string &key) {
+  put(key, string{});
+  hashmap_.erase(key);
+}
+
+std::string Database::get(const string &key) {
+  // assume all key in memory
+  if (!hashmap_.find(key)) {
+    return string{};
+  }
+
+  auto &value = hashmap_.get(key);
+  return active_file_->read(value.offset, value.value_size);
 }

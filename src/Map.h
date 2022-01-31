@@ -19,6 +19,10 @@ struct Value {
 class Map {
  public:
   void put(const std::string& key, const Value& value);
+  bool find(const std::string& key);
+  void erase(const std::string& key);
+
+  Value& get(const std::string& key);
 
  private:
   std::unordered_map<std::string, Value> map_{};

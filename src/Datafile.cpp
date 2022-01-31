@@ -20,7 +20,9 @@ using std::vector;
 }  // namespace
 
 Datafile::Datafile(string file_name)
-    : file_name_{move(file_name)}, io_{file_name_, std::ios_base::out} {
+    : file_name_{move(file_name)},
+      io_{file_name_,
+          std::ios_base::out | std::ios_base::in | std::ios_base::trunc} {
   // default is active
   io_ << true;
   io_.sync();
@@ -51,3 +53,16 @@ bool Datafile::insert(const Block& block) {
 bool Datafile::active() const { return active_; }
 
 uint64_t Datafile::offset() { return static_cast<std::uint64_t>(io_.tellp()); }
+
+std::string Datafile::read(std::size_t offset, std::size_t size) {
+  uint64_t old_offset = this->offset();
+  io_.seekg(static_cast<std::streamoff>(offset));
+
+  vector<char> v(size, ' ');
+
+  io_.read(v.data(), static_cast<std::streamsize>(size));
+
+  io_.seekg(static_cast<std::streamoff>(old_offset));
+
+  return string{v.data(), size};
+}
