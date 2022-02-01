@@ -9,6 +9,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace tinydb {
+
 struct Value {
   std::uint64_t file_id;
   std::size_t value_size;
@@ -18,14 +20,16 @@ struct Value {
 
 class Map {
  public:
-  void put(const std::string& key, const Value& value);
-  bool find(const std::string& key);
-  void erase(const std::string& key);
+  void put(const std::string &key, const Value &value);
+  bool find(const std::string &key);
+  void erase(const std::string &key);
 
-  Value& get(const std::string& key);
+  Value &get(const std::string &key);
 
  private:
   std::unordered_map<std::string, Value> map_{};
 };
+
+}  // namespace tinydb
 
 #endif  // SRC_MAP_H_

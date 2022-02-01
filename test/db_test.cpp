@@ -25,6 +25,7 @@ using std::unordered_map;
 using std::vector;
 using std::chrono::duration;
 using std::chrono::steady_clock;
+using tinydb::Database;
 
 const int kSize = 26;
 class Random {

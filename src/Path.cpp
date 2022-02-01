@@ -15,7 +15,11 @@ using std::string;
 using std::vector;
 }  // namespace
 
+namespace tinydb {
+
 string Path::data_file_name(uint64_t file_id) {
   return string("./") + Conf::data_file_dir_ + "/" + std::to_string(file_id) +
          Conf::data_file_suffix_;
 }
+
+}  // namespace tinydb

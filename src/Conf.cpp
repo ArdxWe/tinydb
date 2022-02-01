@@ -6,6 +6,10 @@
 
 #include <cstddef>
 
+namespace tinydb {
+
 const std::size_t Conf::data_file_size = 8 * 1024 * 1024;  // Bytes
-const char* Conf::data_file_suffix_ = ".data";
-const char* Conf::data_file_dir_ = "data";
+const char *Conf::data_file_suffix_ = ".data";
+const char *Conf::data_file_dir_ = "data";
+
+}  // namespace tinydb

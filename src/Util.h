@@ -7,6 +7,8 @@
 
 #include <string>
 
+namespace tinydb {
+
 class Util {
  public:
   static bool big_endian();
@@ -15,8 +17,8 @@ class Util {
   static T reverse(T data) {
     T res;
 
-    char* data_begin = reinterpret_cast<char*>(&data);
-    char* res_begin = reinterpret_cast<char*>(&res);
+    char *data_begin = reinterpret_cast<char *>(&data);
+    char *res_begin = reinterpret_cast<char *>(&res);
 
     for (int i = 0; i < static_cast<int>(sizeof(data)); i++) {
       res_begin[i] = data_begin[sizeof(data) - 1 - i];
@@ -24,5 +26,6 @@ class Util {
     return res;
   }
 };
+}  // namespace tinydb
 
 #endif  // SRC_UTIL_H_

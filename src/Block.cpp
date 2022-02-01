@@ -21,6 +21,8 @@ using std::uint64_t;
 using std::vector;
 }  // namespace
 
+namespace tinydb {
+
 Block::Block(const string &key, const string &value)
     : timestamp_{time(nullptr)},
       key_size_{static_cast<size_t>(key.size())},
@@ -77,9 +79,4 @@ uint64_t Block::value_offset() const {
 
 time_t Block::timestamp() const { return timestamp_; }
 
-Block::Block(const string &key)
-    : timestamp_{time(nullptr)},
-      key_size_{static_cast<size_t>(key.size())},
-      value_size_{0},
-      key_{key},
-      value_{} {}
+}  // namespace tinydb

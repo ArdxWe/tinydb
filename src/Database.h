@@ -12,15 +12,17 @@
 #include "Datafile.h"
 #include "Map.h"
 
+namespace tinydb {
+
 class Database {
  public:
   Database();
-  Database(const Database& other) = delete;
-  Database& operator=(const Database& other) = delete;
+  Database(const Database &other) = delete;
+  Database &operator=(const Database &other) = delete;
 
-  void put(const std::string& key, const std::string& value);
-  void del(const std::string& key);
-  std::string get(const std::string& key);
+  void put(const std::string &key, const std::string &value);
+  void del(const std::string &key);
+  std::string get(const std::string &key);
 
  private:
   std::vector<std::string> old_files_{};
@@ -29,5 +31,7 @@ class Database {
 
   std::uint64_t file_id_ = 0;
 };
+
+}  // namespace tinydb
 
 #endif  // SRC_DATABASE_H_

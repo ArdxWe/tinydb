@@ -6,7 +6,6 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 
 #include "Block.h"
 #include "Map.h"
@@ -16,6 +15,8 @@ namespace {
 using std::make_unique;
 using std::string;
 }  // namespace
+
+namespace tinydb {
 
 void Database::put(const string &key, const string &value) {
   Block block{key, value};
@@ -73,3 +74,5 @@ std::string Database::get(const string &key) {
   string s = target_file->read(value.offset, value.value_size);
   return s;
 }
+
+}  // namespace tinydb

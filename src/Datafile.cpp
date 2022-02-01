@@ -19,6 +19,8 @@ using std::uint64_t;
 using std::vector;
 }  // namespace
 
+namespace tinydb {
+
 Datafile::Datafile(string file_name, bool read_only)
     : file_name_{move(file_name)},
       io_{file_name_, read_only ? std::ios_base::in
@@ -28,7 +30,7 @@ Datafile::Datafile(string file_name, bool read_only)
   if (!read_only) io_ << true;
 }
 
-bool Datafile::insert(const Block& block) {
+bool Datafile::insert(const Block &block) {
   vector<char> buff = block.serializer();
 
   auto file_size = static_cast<std::size_t>(offset());
@@ -66,3 +68,5 @@ std::string Datafile::read(std::size_t offset, std::size_t size) {
   return string{v.data(), size};
 }
 std::string Datafile::filename() const { return file_name_; }
+
+}  // namespace tinydb
