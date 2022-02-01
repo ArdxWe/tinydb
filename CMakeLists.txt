@@ -21,3 +21,5 @@ add_executable(tinydb
                src/Map.h
                src/Path.cpp
                src/Path.h)
+
+execute_process(COMMAND sh ../init.sh)

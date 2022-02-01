@@ -24,7 +24,7 @@ void Database::put(const string &key, const string &value) {
   if (!active_file_->insert(block)) {
     file_id_++;
     string active_file_name = Path::data_file_name(file_id_);
-    old_files_.push_back(move(active_file_));
+    old_files_.push_back(active_file_->filename());
     active_file_ = make_unique<Datafile>(active_file_name);
 
     // updated file has new offset
@@ -63,5 +63,13 @@ std::string Database::get(const string &key) {
   }
 
   auto &value = hashmap_.get(key);
-  return active_file_->read(value.offset, value.value_size);
+
+  if (Path::data_file_name(value.file_id) == active_file_->filename()) {
+    return active_file_->read(value.offset, value.value_size);
+  }
+
+  string target_file_name = Path::data_file_name(value.file_id);
+  auto target_file = make_unique<Datafile>(target_file_name, true);
+  string s = target_file->read(value.offset, value.value_size);
+  return s;
 }

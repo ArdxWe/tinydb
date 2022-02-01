@@ -23,7 +23,7 @@ class Database {
   std::string get(const std::string& key);
 
  private:
-  std::vector<std::unique_ptr<Datafile>> old_files_{};
+  std::vector<std::string> old_files_{};
   std::unique_ptr<Datafile> active_file_{};
   Map hashmap_{};
 

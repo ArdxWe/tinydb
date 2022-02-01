@@ -19,13 +19,13 @@ using std::uint64_t;
 using std::vector;
 }  // namespace
 
-Datafile::Datafile(string file_name)
+Datafile::Datafile(string file_name, bool read_only)
     : file_name_{move(file_name)},
-      io_{file_name_,
-          std::ios_base::out | std::ios_base::in | std::ios_base::trunc} {
+      io_{file_name_, read_only ? std::ios_base::in
+                                : std::ios_base::out | std::ios_base::in |
+                                      std::ios_base::trunc} {
   // default is active
-  io_ << true;
-  io_.sync();
+  if (!read_only) io_ << true;
 }
 
 bool Datafile::insert(const Block& block) {
@@ -46,7 +46,6 @@ bool Datafile::insert(const Block& block) {
   io_.write(buff.data(), static_cast<std::streamsize>(buff.size()));
 
   // write into disk
-  io_.sync();
   return true;
 }
 
@@ -66,3 +65,4 @@ std::string Datafile::read(std::size_t offset, std::size_t size) {
 
   return string{v.data(), size};
 }
+std::string Datafile::filename() const { return file_name_; }
