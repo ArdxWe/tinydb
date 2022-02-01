@@ -1,5 +1,6 @@
 #include <array>
 #include <chrono>
+#include <cstdint>
 #include <iostream>
 #include <random>
 #include <string>
@@ -8,17 +9,25 @@
 #include "Database.h"
 
 namespace {
+using std::array;
 using std::cout;
+using std::default_random_engine;
 using std::endl;
+using std::random_device;
 using std::string;
+using std::uint64_t;
+using std::uniform_int_distribution;
 using std::unordered_map;
+using std::chrono::duration;
+using std::chrono::steady_clock;
 
+const int kSize = 26;
 class Random {
  public:
-  Random() : uniform_dist_{0, 25} {
+  Random() : e_{r_()}, uniform_dist_{0, kSize - 1} {
     char start = 'a';
     for (int i = 0; i < 26; i++) {
-      arr_[i] = start + i;
+      arr_[i] = static_cast<char>(start + i);
     }
   }
 
@@ -31,46 +40,49 @@ class Random {
   }
 
  private:
-  std::random_device r_{};
+  random_device r_{};
 
-  std::default_random_engine e_{};
-  std::uniform_int_distribution<int> uniform_dist_;
+  default_random_engine e_;
+  uniform_int_distribution<int> uniform_dist_;
 
-  std::array<char, 26> arr_{};
+  array<char, kSize> arr_{};
 };
 }  // namespace
 
 int main() {
-  auto start = std::chrono::steady_clock::now();
-
-  std::uint64_t bytes = 0;
+  uint64_t bytes = 0;
   Random r;
   unordered_map<string, string> map;
   Database db;
 
-  for (int i = 1; i < 40000; i++) {
-    string key = r.get(i % 58);
-    string value = r.get(i % 20000);
+  for (int i = 1; i < 1000000; i++) {
+    string key = r.get(i % 0x100);
+    string value = r.get(i % 0x1000);
     map[key] = value;
-    db.put(key, value);
   }
 
-  for (auto& pair : map) {
+  auto start = steady_clock::now();
+
+  for (const auto& pair : map) {
+    db.put(pair.first, pair.second);
+  }
+
+  for (const auto& pair : map) {
     bytes += pair.first.size() + pair.second.size();
+
     if (db.get(pair.first) != pair.second) {
       cout << "error" << endl;
       break;
     }
   }
 
-  std::cout << "items: " << map.size() << std::endl;
-  std::cout << "bytes: " << bytes / 1024.0 / 1024.0 / 1024.0 << "GB"
-            << std::endl;
-  auto end = std::chrono::steady_clock::now();
-  std::chrono::duration<double> elapsed_seconds =
-      std::chrono::duration<double>(end - start);
+  cout << "pairs: " << map.size() << endl;
+  cout << "bytes: " << static_cast<double>(bytes) / 1024 / 1024 / 1024 << "GB"
+       << endl;
 
-  std::cout << "time: " << elapsed_seconds.count() << "s\n";
+  auto end = steady_clock::now();
+  duration<double> elapsed_seconds = duration<double>(end - start);
 
+  cout << "time: " << elapsed_seconds.count() << "s" << endl;
   return 0;
 }
