@@ -1,3 +1,5 @@
+#include "Database.h"
+
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -8,7 +10,6 @@
 #include <utility>
 #include <vector>
 
-#include "Database.h"
 #include "gtest/gtest.h"
 
 namespace {

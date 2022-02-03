@@ -79,4 +79,68 @@ uint64_t Block::value_offset() const {
 
 time_t Block::timestamp() const { return timestamp_; }
 
+// block format --- timestamp --- key size --- value size --- key --- value
+vector<Block> Block::deserializer(const vector<char> &buff) {
+  vector<Block> res;
+
+  size_t offset = 0;
+  const char *cur = buff.data();
+
+  while (offset != static_cast<size_t>(buff.size())) {
+    time_t timestamp;
+    size_t key_size;
+    size_t value_size;
+
+    string time_str = string{cur, sizeof(time_t)};
+    string key_size_str = string{cur + sizeof(time_t), sizeof(size_t)};
+    string value_size_str =
+        string{cur + sizeof(time_t) + sizeof(size_t), sizeof(size_t)};
+
+    if (!Util::big_endian()) {
+      timestamp = Util::reverse(*reinterpret_cast<time_t *>(time_str.data()));
+      key_size =
+          Util::reverse(*reinterpret_cast<size_t *>(key_size_str.data()));
+      value_size =
+          Util::reverse(*reinterpret_cast<size_t *>(value_size_str.data()));
+    } else {
+      timestamp = *reinterpret_cast<time_t *>(time_str.data());
+      key_size = *reinterpret_cast<size_t *>(key_size_str.data());
+      value_size = *reinterpret_cast<size_t *>(value_size_str.data());
+    }
+
+    string key =
+        string{cur + sizeof(timestamp) + sizeof(key_size) + sizeof(value_size),
+               key_size};
+    string value = string{cur + sizeof(timestamp) + sizeof(key_size) +
+                              sizeof(value_size) + key_size,
+                          value_size};
+
+    res.emplace_back(timestamp, key_size, value_size, move(key), move(value));
+
+    std::size_t block_size = sizeof(timestamp) + sizeof(key_size) +
+                             sizeof(value_size) + key_size + value_size;
+
+    offset += block_size;
+    cur += block_size;
+  }
+
+  return res;
+}
+
+Block::Block(time_t timestamp, size_t key_size, size_t value_size, string &&key,
+             string &&value)
+    : timestamp_{timestamp},
+      key_size_{key_size},
+      value_size_{value_size},
+      key_{move(key)},
+      value_{move(value)} {}
+
+std::size_t Block::key_size() const { return key_size_; }
+
+std::size_t Block::value_size() const { return value_size_; }
+
+std::string Block::key() const { return key_; }
+
+std::string Block::value() const { return value_; }
+
 }  // namespace tinydb
