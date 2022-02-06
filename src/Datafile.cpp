@@ -5,6 +5,7 @@
 #include "Datafile.h"
 
 #include <cassert>
+#include <cstddef>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,6 +15,7 @@
 
 namespace {
 using std::move;
+using std::size_t;
 using std::string;
 using std::uint64_t;
 using std::vector;
@@ -21,42 +23,51 @@ using std::vector;
 
 namespace tinydb {
 
+bool Datafile::include(const Block &block) {
+  return block.size() + sizeof(bool) <= Conf::data_file_size;
+}
+
 Datafile::Datafile(string file_name, bool read_only)
     : file_name_{move(file_name)},
-      io_{file_name_, read_only ? std::ios_base::in
+      io_{file_name_, read_only ? std::ios_base::in | std::ios_base::ate
                                 : std::ios_base::out | std::ios_base::in |
                                       std::ios_base::trunc} {
   // default is active
-  if (!read_only) io_ << true;
+  if (!read_only) {
+    io_ << true;
+  }
 }
 
 bool Datafile::insert(const Block &block) {
+  assert(active_);
+
   vector<char> buff = block.serializer();
 
-  auto file_size = static_cast<std::size_t>(offset());
+  auto file_size = static_cast<size_t>(offset());
 
+  // this file is full
   if (file_size + buff.size() > Conf::data_file_size) {
     active_ = false;
 
     io_.seekp(0);
     io_ << false;
-    io_.close();
 
     return false;
   }
 
   io_.write(buff.data(), static_cast<std::streamsize>(buff.size()));
-
-  // write into disk
   return true;
 }
 
+uint64_t Datafile::offset() { return static_cast<uint64_t>(io_.tellp()); }
+
 bool Datafile::active() const { return active_; }
 
-uint64_t Datafile::offset() { return static_cast<std::uint64_t>(io_.tellp()); }
-
-std::string Datafile::read(std::size_t offset, std::size_t size) {
+std::string Datafile::read(std::uint64_t offset, std::size_t size) {
   uint64_t old_offset = this->offset();
+
+  assert(offset >= 0 && offset < old_offset);
+
   io_.seekg(static_cast<std::streamoff>(offset));
 
   vector<char> v(size, ' ');
@@ -67,6 +78,7 @@ std::string Datafile::read(std::size_t offset, std::size_t size) {
 
   return string{v.data(), size};
 }
+
 std::string Datafile::filename() const { return file_name_; }
 
 }  // namespace tinydb

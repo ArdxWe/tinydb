@@ -4,6 +4,7 @@
 
 #include "Block.h"
 
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -13,9 +14,9 @@
 #include "gtest/gtest.h"
 
 namespace {
-using std::size_t;
 using std::string;
 using std::time_t;
+using std::uint32_t;
 using std::vector;
 }  // namespace
 
@@ -26,8 +27,8 @@ TEST(BlockTest, deserializer) {
   string value = "database";
 
   time_t stamp = 0x11223344;
-  size_t key_size = key.size();
-  size_t value_size = value.size();
+  uint32_t key_size = key.size();
+  uint32_t value_size = value.size();
 
   if (!Util::big_endian()) {
     stamp = Util::reverse(stamp);

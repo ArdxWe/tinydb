@@ -4,6 +4,8 @@
 
 #include "Database.h"
 
+#include <cassert>
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -14,12 +16,21 @@
 namespace {
 using std::make_unique;
 using std::string;
+using std::uint64_t;
 }  // namespace
 
 namespace tinydb {
 
+Database::Database() {
+  string active_file_name = Path::data_file_name(file_id_);
+  active_file_ = make_unique<Datafile>(active_file_name);
+}
+
 void Database::put(const string &key, const string &value) {
-  Block block{key, value};
+  const Block block{key, value};
+
+  assert(Datafile::include(block));
+
   std::uint64_t offset = active_file_->offset() + block.value_offset();
 
   if (!active_file_->insert(block)) {
@@ -45,11 +56,6 @@ void Database::put(const string &key, const string &value) {
       block.timestamp(),
   };
   hashmap_.put(key, v);
-}
-
-Database::Database() {
-  string active_file_name = Path::data_file_name(file_id_);
-  active_file_ = make_unique<Datafile>(active_file_name);
 }
 
 void Database::del(const string &key) {

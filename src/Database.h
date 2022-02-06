@@ -5,6 +5,7 @@
 #ifndef SRC_DATABASE_H_
 #define SRC_DATABASE_H_
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
