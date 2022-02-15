@@ -9,6 +9,7 @@
 #include <ctime>
 #include <fstream>
 #include <string>
+#include <vector>
 
 namespace tinydb {
 
@@ -16,6 +17,8 @@ class Block;
 class Datafile {
  public:
   static bool include(const Block &block);
+  [[maybe_unused]] static std::vector<char> get_content(
+      const std::string &file_name);
 
   explicit Datafile(std::string file_name, bool read_only = false);
 

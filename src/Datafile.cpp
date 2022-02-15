@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <fstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -14,6 +15,7 @@
 #include "Conf.h"
 
 namespace {
+using std::ifstream;
 using std::move;
 using std::size_t;
 using std::string;
@@ -25,6 +27,31 @@ namespace tinydb {
 
 bool Datafile::include(const Block &block) {
   return block.size() + sizeof(bool) <= Conf::data_file_size;
+}
+
+[[maybe_unused]] std::vector<char> Datafile::get_content(
+    const string &file_name) {
+  auto get_file_size = [&file_name]() {
+    std::ifstream in(file_name, std::ifstream::ate | std::ifstream::binary);
+    return in.tellg();
+  };
+
+  std::size_t size = get_file_size();
+  assert(size > 1);
+
+  // ignore active flag
+  vector<char> res(size - 1, 0);
+
+  ifstream file{file_name};
+  assert(file.is_open());
+
+  // file should be un-active
+  bool active;
+  file >> active;
+  assert(!active);
+
+  file.read(res.data(), static_cast<std::streamsize>(res.size()));
+  return res;
 }
 
 Datafile::Datafile(string file_name, bool read_only)
@@ -80,5 +107,4 @@ std::string Datafile::read(std::uint64_t offset, std::size_t size) {
 }
 
 std::string Datafile::filename() const { return file_name_; }
-
 }  // namespace tinydb
