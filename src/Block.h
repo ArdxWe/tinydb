@@ -17,6 +17,8 @@ class Block {
   friend class Datafile;
 
   static std::vector<Block> deserializer(const std::vector<char>& buff);
+  static std::vector<Block> merger(const std::vector<Block>& first,
+                                   const std::vector<Block>& second);
 
   Block(const std::string& key, const std::string& value);
   Block(std::time_t timestamp, std::uint32_t key_size, std::uint32_t value_size,

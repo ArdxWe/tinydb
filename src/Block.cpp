@@ -4,21 +4,26 @@
 
 #include "Block.h"
 
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <string>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "Util.h"
 
 namespace {
+using std::pair;
 using std::size_t;
 using std::string;
 using std::time;
 using std::time_t;
 using std::uint32_t;
+using std::unordered_map;
 using std::vector;
 }  // namespace
 
@@ -69,6 +74,58 @@ vector<Block> Block::deserializer(const vector<char> &buff) {
     cur += block_size;
   }
 
+  return res;
+}
+
+vector<Block> Block::merger(const vector<Block> &first,
+                            const vector<Block> &second) {
+  enum class File : int8_t {
+    first,
+    second,
+  };
+
+  // no copy
+  unordered_map<string, pair<File, int>> map;
+
+  auto get_block = [&map, &first, &second](const string &key) -> const Block & {
+    if (map[key].first == File::first) {
+      return first[map[key].second];
+    } else {
+      return second[map[key].second];
+    }
+  };
+
+  auto merge = [&map, &get_block](const vector<Block> &v, File type) {
+    for (int i = 0; i < static_cast<int>(v.size()); i++) {
+      const string &key = v[i].key();
+      pair<File, int> value = {type, i};
+
+      if (map.find(key) == map.end()) {
+        map[key] = value;
+      } else {
+        const Block &block = get_block(key);
+        if (block.timestamp() < v[i].timestamp()) {
+          map[key] = value;
+        }
+      }
+    }
+  };
+
+  merge(first, File::first);
+  merge(second, File::second);
+
+  vector<Block> res;
+  for (const auto &pair : map) {
+    const Block *block;
+    if (pair.second.first == File::first) {
+      block = &first[pair.second.second];
+    } else {
+      block = &second[pair.second.second];
+    }
+
+    res.emplace_back(block->timestamp(), block->key_size(), block->value_size(),
+                     block->key(), block->value());
+  }
   return res;
 }
 
